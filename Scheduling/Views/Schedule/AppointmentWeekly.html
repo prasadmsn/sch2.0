@@ -1,0 +1,65 @@
+﻿
+<div class="scheduling-provider-appointmenthours-appointmentweekly">
+    <div class="calendar-header">
+        <div class="header-container">
+
+            <div class="calendar-header-row">
+                <div class="calendar-header-timecell"></div>
+                <!-- ko foreach:weekdays -->
+                <div class="calendar-header-daycell">
+                    <span data-bind="text:$data.getDate()" style="font-weight:bold;float:left;margin-left:2px"></span>
+                    <span data-bind="text:CrmData.WeekDays[$data.getDay()]"></span>
+                </div>
+                <!-- /ko -->
+            </div>
+
+        </div>
+    </div>
+    <!-- the calendar's body -->
+    <div class="calendar-body">
+
+        <div class="body-container">
+            <div class="calendar-timeCol"></div>
+            <div class="calendar-weeksCol"></div>
+            <div class="calendar-row-timecontainer">
+                <div class="calendar-row-timetable">
+                    <!-- ko foreach:timings -->
+                    <!-- ko if:!$data.IsHalfPastHour() -->
+                    <div class="calendar-row" data-bind="attr: { id: 'tr_' + $index() }">
+                        <div class="calendar-row-timecell" style="vertical-align:top">
+                            <span data-bind="text:hour" style="font-size:large;font-weight:bold"></span>
+                            <span data-bind="text:suffix" style="vertical-align:super;font-weight:lighter"></span>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+            </div>
+            <div class="calendar-row-daycontainer">
+                <div class="calendar-row-daytable">
+                    <div class="rows">
+                        <!-- ko foreach:timings -->
+                        <div class="calendar-row" data-bind="value:$data,attr:{id:'timeRow_' + $data.hour}">
+                            <!-- ko foreach:$root.weekdays -->
+                            <div class="calendar-row-daycell" data-bind="click:$root.onCellClick,attr:{id:'cell_'+$parent.hour+'_'+$data.getDate()}">
+                                <!-- ko if:($parent.hour.indexOf(':30')<0) -->
+                                <!-- ko foreach:AppData.where($root.weekAppointments(), function(h){ return $root.isCurrentTimeSlotAppointment($parent,$data,h); }) -->
+                                <div class="user-appointment" data-bind="title:title,style:{height:$data.scheduleddurationminutes + 'px',top:((new Date(scheduledstart)).getMinutes() + 1) + 'px','border-color':  $data.bordercolorcode()},attr:{location:$data.equipmentid}">
+                                    <div class="user-appointment-content" data-bind="style:{height:$data.scheduleddurationminutes + 'px','background-color':$data.color()}">
+                                        <div data-bind="text:$data.subject+', '+$data.location,style:{'font-size':($data.scheduleddurationminutes<=15)?'small':'normal'}"></div>
+                                    </div>
+                                </div>
+                                <!-- /ko -->
+                                <!-- /ko -->
+
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>

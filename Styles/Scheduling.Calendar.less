@@ -1,0 +1,281 @@
+﻿
+@week-color: #0094FF;
+@day-color: #E8EEF4;
+@calendar-border-color: #90ccf8;
+@work-hour-color: #E8EEF4;
+
+.scheduling-provider-workhours-calendar {
+    cursor: default;
+    margin-bottom: 200px; //extra room for flyout
+     .msg{
+        font-size: 14px;
+
+    }
+    .calendar-month-header {
+        position: relative;
+        width: auto;
+        max-width: 1051px;
+        min-width: 840px;
+        line-height: 30px;
+        text-align: center;
+        border: solid 1px @calendar-border-color;
+        border-bottom: none;
+        background: whitesmoke;
+
+        button {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            border: none;
+            background: none; 
+            color: #808080;
+        }
+
+        .month-header {
+            display: inline-block;
+            width: 160px; 
+            color: #0094FF;
+        }
+
+        .icon-toolbar {
+             position: absolute;
+            float: left;
+            right: 0;
+            top: 0;
+
+            button {
+                width: 30px;
+                height: 30px;
+                vertical-align: top;
+            }
+        }
+    }
+
+    .calendar-table {
+        display: table;
+        min-width: 840px;
+        border-collapse: collapse;
+
+        .calendar-week-header {
+            display: table-row;
+
+            .calendar-column {
+                display: table-cell;
+                width: 150px;
+                vertical-align: top;
+                border: solid 1px @calendar-border-color;
+
+                .week-header {
+                    height: 30px;
+                    line-height: 30px;
+                    text-align: center;
+                    color: @week-color;
+                    background: #fff;
+                }
+            }
+        }
+
+        .calendar-row {
+            display: table-row;
+
+            .calendar-day {
+                display: table-cell;
+                width: 150px;
+                vertical-align: top;
+                border: solid 1px @calendar-border-color;
+                &.selected
+                  {
+                       border: 2px solid red !important;
+                                 
+                  }
+
+                .calendar-cell {
+                    position: relative;
+                    height: 120px;
+                    background: whitesmoke;
+
+                    .day-header {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        height: 30px;
+                        line-height: 30px;
+                        padding-left: 10px;
+                        color: #fff;
+                        background: #ccc;
+                        border-bottom: solid 1px @calendar-border-color;
+                    }
+
+                    .add-button {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        cursor: pointer;
+                        border: none;
+                        background: none;
+                        display: none;
+                        width:auto;
+                    }
+
+                    &.selected-month {
+                        background: #fff;
+
+                        .day-header {
+                            color: @week-color;
+                            background: @day-color;
+                        }
+                    }
+
+                    &:hover {
+                        background: @day-color;
+                        border: solid 1px #0094ff;
+
+                        .day-header {
+                            color: #fff;
+                            background: @week-color;
+                        }
+
+                        .add-button {
+                            display: inline-block;
+                        }
+                    }
+
+                    .day-schedule {
+                        position: absolute;
+                        top: 35px;
+                        left: 5px;
+                        right: 5px;
+                        bottom: 0;
+                        cursor: pointer;
+                        overflow: hidden;
+                        overflow-y: auto;
+                            
+
+                        .schedule-item {
+                            height: 25px;
+                            line-height: 25px;
+                            color: #262626; 
+                            border: none;
+                            border-left:solid 6px @calendar-border-color; 
+                            margin-top:3px;
+                            font-size:12px !important;
+                            img {
+                                width: 20px;
+                                height: 20px;
+                                vertical-align: sub;
+                                margin-right: 4px;
+                            }
+
+                            &.weekly {
+                               
+                            }
+
+                            &.daily {
+                                 
+                            }
+
+                            &.timeoff {
+                                background: #FFDEC7;
+                            }
+
+                            &.break {
+                                background: #FFDEC7;
+                            }
+
+                            &.related {
+                              border: none;
+                              border-left:solid 6px #90ccf8 !important; 
+                              border-color:#7F74F7!important;
+                              background-color:#a7cdf0 !important;
+                            }
+
+                            &.selected
+                            {
+                              border: none;
+                              border-left:solid 6px #90ccf8; 
+                              border-color:#7F74F7!important;
+                              background-color:#a7cdf0 !important;
+                           }
+                        }
+
+                       
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+   
+.ccx-tile-menu {
+    position: relative;
+    max-width: 700px;
+    margin: 20px;
+    display:inline-block;
+
+    a {
+        text-decoration: none;
+    }
+    .locationTile{ 
+        display: inline-block;
+        margin: 2px;
+        width: 180px;
+        height: 50px;
+        line-height: 45px;
+        box-shadow:2px 2px 2px black;  
+        border:none;
+        border-left:solid 6px;
+        text-align: left;
+        font-size: 16px !important;
+        font-weight: normal;
+        vertical-align: top;
+        padding-left: 5px;
+        color:black;
+         
+    }
+
+    .tile {
+        display: inline-block;
+        margin: 2px;
+        width: 220px;
+        height: 50px;
+        line-height: 45px;
+        box-shadow:2px 2px 2px;  
+        text-align: left;
+        font-size: 16px !important;
+        font-weight: normal;
+        vertical-align: top;
+        padding-left: 5px; 
+
+        img {
+            vertical-align: middle;
+            margin: 0 6px;
+            border: none;
+            width: 32px;
+            height: 32px;
+        }
+
+        &:hover {
+            background: #EFC26E;
+            cursor: pointer;
+        }
+
+        &.green {
+            background: #B4D48E;
+        }
+
+        &.blue {
+            background: #e8eef4;
+
+            &:hover {
+                background: #93C3F2;
+            }
+        }
+
+        &.wide {
+            width: 460px;
+        }
+    }
+}

@@ -1,0 +1,1084 @@
+<script type="text/html" data-template="view" id="Scheduling-Administration"><div class="scheduling-administration">
+    <div class="LeftPanel">
+       <div>
+            <h2 style="display:table-cell;padding:15px;vertical-align:top;cursor:pointer;color:#2893ff;font-weight:normal;font-size:26px;" class="title">Scheduling Administration</h2>
+        </div>
+        <div class="ccx-portal-menu" id="Administration-Nav-TopBar">
+            <a class="menu-item button" data-bind="event:{click:SetSubMenusVisibility}"><span>Resource Groups</span></a>
+            <a class="menu-item button" data-bind="event:{click:SetSubMenusVisibility}"><span>Locations</span></a>
+            <a class="menu-item button" data-bind="event:{click:SetCalendarSubMenuVisibility}"><span>Calendars</span></a>
+            <a class="menu-item button" data-bind="event:{click:SetSubMenusVisibility}"><span>Guidelines</span></a>
+            <a class="menu-item button" data-bind="event:{click:SetSubMenusVisibility}"><span>Paneling</span></a>
+        </div>
+        <br />
+        <div class="ccx-portal-menu" id="Administration-Calendar-SubMenuBar" data-bind="visible:CalendarSubMenuVisibility">
+            <a class="menu-item button selected" data-bind="onclick: SetCalendarSubMenuVisibility"><span>Provider Search</span></a>
+            <a class="menu-item button"><span>Add New Provider Calendar</span></a>
+        </div>
+        <br />
+        <div id="LeftPanelTargetContainer"></div>
+    </div>
+   
+    <div class="RightPanel" id="divRight-tab">
+
+    </div>
+</div></script>
+<script type="text/html" data-template="view" id="Scheduling-CalendarAdministrationMyServices"><style type="text/css">
+    table.gridtable {
+        font-family: verdana,arial,sans-serif;
+        font-size: 15px;
+        color: rgba(40, 146, 254, 1);
+        border-width: 1px;
+        border-color: rgba(40, 146, 254, 1);
+        border-collapse: collapse;
+        width:100%;
+    }
+
+        table.gridtable th {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: rgba(40, 146, 254, 1);
+            background-color: white;
+        }
+
+        table.gridtable td {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: rgba(40, 146, 254, 1);
+            background-color: #ffffff;
+        }
+</style>
+<div class="medication-sliding-scale" style="margin: 20px;">
+    <div>
+        <table class="gridtable">
+            <thead>
+                <tr data-bind="foreach: ColumnValue">
+                    <th>
+                        <span data-bind="text: Text">
+                        </span>
+                    </th>
+                    
+                </tr>
+
+            </thead>
+            <tbody data-bind="foreach: RowValue">
+                <tr style="height:60px">
+                    <td>
+                        <span data-bind="text: Text">
+                        </span>
+                    </td>
+                    <!-- ko foreach: $root.ColumnValue -->
+                    <!-- ko if: Text != '' -->
+                    <td>
+                        <div>                       
+                        </div>                        
+                    </td>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <input type="button" value="Save My Services" />
+</div></script>
+<script type="text/html" data-template="view" id="Scheduling-ConfirmationView">
+<div id="ConfirmationMessageView" data-bind="visible: IsConflict">
+    <div>
+        <br />
+        You are attempting to save a new Work Hours that conflict with Existing Work Hours on your calendar <br />
+        <ul>
+            <li>Existing Work Hours Facility : <span class="conflictstyle" data-bind="text: $root.ConflictFacilityName"></span></li>
+            <li>Existing Schedule : <span class="conflictstyle" data-bind="text: $root.ConflictSchedule"></span> </li>
+        </ul>
+    </div>
+    <div class="form-toolbar">
+        <button data-bind="onclick: CancelConflict">
+            Keep Existing Work Hours
+        </button>
+        <button data-bind="onclick: SaveConflict">
+            Save New Work Hours
+        </button>
+    </div>
+</div>
+
+</script>
+<script type="text/html" data-template="view" id="Scheduling-ProviderProfileDisplay"><div id="Provider-Search" data-bind="visible:ProviderSearchVisibility">
+    <div>
+        <label data-bind="text: SearchLabel"></label>
+        <input class="wide" data-bind="field: $root.SearchExpression, type: AppUI.FieldType.lookup, search: ProviderSearch, select: SelectItem, enable: $root.IsSmartSearchEnabled, style: { backgroundColor: ($root.IsSmartSearchEnabled()? 'white': 'whitesmoke')},style:{width:'500px' }" />
+    </div>
+</div>
+<div id="Provider-details-display" class="provider-details" data-bind="visible:ProviderDetailsVisibility">
+    <div class="header">
+
+        <div>
+            <a target="_blank" data-bind="attr: { href: $root.ProviderProfileUrl }, target: '_blank'"><img alt="Provider Image" data-bind="    attr: { src: $root.ProviderImageUrl }" onerror="this.onerror = null; this.src = location.origin + '/_imgs/ContactPhoto.png';" /></a>
+        </div>
+        <div style="vertical-align:top;padding-left:5px;">
+            <span data-bind="text: $root.ProviderFullName"></span>
+            <br />
+            <span data-bind="text: $root.ProviderTitle"></span>
+            <br />
+            <a  target="_blank" data-bind="attr:{href:$root.ProviderProfileUrl},target:'_blank'"><span>Edit Profile</span></a>
+        </div>
+    </div>
+    <div>
+        <ul>
+            
+            <li>
+                <button data-bind="onclick:ShowCalendar">
+                    Work Hours
+                </button>
+            </li>
+            <li><button data-bind="onclick:ShowAppointments">Appointments</button></li>
+            <li><button>Paneling</button></li>
+            <li><button>Guidelines</button></li>
+            <li><button>Services</button></li>
+
+        </ul>
+
+    </div>
+
+
+</div></script>
+<script type="text/html" data-template="view" id="Scheduling-View"><div class="ccx-page">
+
+    <div class="page-header">
+
+        <a class="back" data-bind="click: function(d) { window.history.back() }"></a>
+
+        <h1 class="title">Scheduling</h1>
+
+        <div class="page-tab">
+
+            <!--<a data-bind="tab: 'Scheduling-Provider-WorkHours-CalendarView', context: new Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarViewModel('providerid'), target: '#selected-tab'">Work Hours</a>-->
+            <!--<a data-bind="tab: 'Scheduling-Schedule-AppointmentWeekly', context: new Ccx.Scheduling.ViewModels.Schedule.AppointmentWeeklyViewModel, target: '#selected-tab'">Weekly View</a>-->
+            <a data-bind="tab: 'Scheduling-Administration', context: Ccx.Scheduling.ViewModels.AdministrationViewModel, target: '#selected-tab'">Administration View</a>
+        </div>
+    </div>
+
+    <div class="page-content" style="background: white;">
+
+        <div id="selected-tab"></div>
+    </div>
+</div></script>
+<script type="text/html" data-template="view" id="Scheduling-WeeklySchedule"><div class="scheduling-scheduleview">
+    <div class="Scheduling-View-WeeklySchedule" data-bind="visible:WeeklySchedule">
+        <div class="scheduling-view-weeklyschedule-recurring">
+            <div class="table-view">
+                <div class="table-row" style="line-height:30px;">
+                    <div class="col">
+                        <span>Facility:</span>
+                    </div>
+                    <div class="right-col">
+                        <span data-bind="text: FacilityName"></span>
+                    </div>
+                </div>
+                <div class="table-row">
+                    <div class="col" style="width:20%"><span>Work Hours:</span></div>
+                    <div class="right-col"> 
+                        <input type="radio" id="chkWorkHours" name="type" value="1" data-bind="checked: WorkhourType, enable: SED_enable" /> Are the Same Each Day &nbsp;<a href="#" data-bind="event:{click:showSetWorkHour},visible:!VaryByDay(), text: $root.LinkText()"></a>&nbsp;&nbsp;&nbsp;
+                        <input type="radio" id="chkValueByDay" name="type" value="2" data-bind="checked: WorkhourType, enable: VBD_enable" /> Vary by Day
+                       
+                        <span id="spnDataChanged" data-bind="text:IsDataChanged,visible:false"></span>
+                        <span id="spnScheduleType" data-bind="text:WeeklySchedule,visible:false"></span>
+                    </div>
+                </div>
+            </div>
+            <div style="padding-top:5px;">
+                <div class="table-view varybyday" data-bind="visible:VaryByDay">
+                    <!-- ko foreach: DaysCollection -->
+                    <div class="table-row">
+                        <div class="col"><input type="checkbox" value="$data.IsChecked" data-bind="checked: $data.IsChecked" /></div>
+                        <div class="col"><span data-bind="text: $data.WorkDay,style: { color: $data.Color }"></span></div>
+                        <div class="right-col link-width">
+                            <a href="#" data-bind="event:{click:$root.showSetWorkHour.bind($root,$index())}, visible: $data.IsChecked(), text: $data.vbd_LinkText()"></a>
+                            <span data-bind="visible: !$data.IsChecked()">Not Working</span>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="workhour-container" data-bind="visible: SetWorkHour,style:{width: VaryByDay() ? '76%' : '100%' }">
+                    <div id="container">
+                        <div class="tab_container">
+                            <div id="tbWorkHour" class="tab_content">
+                                <div class="workhour-toprow">
+                                    <h3 class="work-hour-title">Enter work hours and breaks</h3>
+                                    <!--<button class="show-capacity">Show Capacity >></button>-->
+                                </div>
+
+                                <div class="scroll-container">
+                                    <div class="table-view">
+                                        <div class="header-row">
+                                            <div class="col">Type</div>
+                                            <div class="col">Start </div>
+                                            <div class="col">End</div>
+                                            <div class="col"> </div>
+                                        </div>
+                                        <!-- ko foreach: ScheduleRows -->
+                                        <div class="table-row" data-bind="style:{'line-height': $root.VaryByDay() ? '25px' : '40px' }">
+                                            <!-- ko if : !($data.IsBreak())  -->
+                                            <span class="col">Work Hours</span>
+                                            <!-- /ko -->
+                                            <!-- ko if : ($data.IsBreak())  -->
+                                            <span class="col">Break</span>
+                                            <!-- /ko -->
+                                            <div class="col">
+                                                <input class="timeControl fixHeight" data-bind="field: $data.WorkStartTime, type: AppUI.FieldType.choice,choices: $root.TimeChoices,event: { change: $root.CalculateObservableChanges.bind($root,'Start',$index())} " />
+                                            </div>
+                                            <div class="col">
+                                                <input class="timeControl fixHeight" data-bind="field: $data.WorkEndTime, type:AppUI.FieldType.choice,choices: $root.TimeChoices,event: { change: $root.CalculateObservableChanges.bind($root,'End',$index())} " />
+                                            </div>
+                                            <!-- ko if : !($data.IsBreak())  -->
+                                            <div class="col">
+                                                <button class="dummyClsAddSchedule" data-bind="event:{click:$root.AddItems.bind($root,$index())},enable: $data.ButtonStatus()"><span>Add Break</span> </button>
+                                            </div>
+                                            <!-- /ko -->
+                                            <!-- ko if : ($data.IsBreak())  -->
+                                            <div class="col">
+                                                <button class="dummyClsAddSchedule" data-bind="event:{click:$root.DeleteItems.bind($root,$index())}"><span>Delete</span></button>
+                                            </div>
+                                            <!-- /ko -->
+                                        </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="strip">Total:<label data-bind="text: Total"></label><label data-bind="text: TimeTypeTotal"></label>,Working: <label data-bind="text: Working"></label> <label data-bind="text: TimeTypeWorking"></label>,Breaks:<label data-bind="text: Breaks"></label> <label data-bind="text: TimeTypeBreaks"></label></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <button title="Commit Day" data-bind="onclick: $root.vbd_Save.bind($root),visible: $root.VaryByDay() && $root.SetWorkHour()"><span>Ok</span></button>
+                    </div>
+                </div>
+               
+                <div id="tableBottom" class="bottom-container">
+                    <div class="table-view">
+                        <div class="table-row" data-bind="visible:!$root.VaryByDay()">
+                            <div class="col">
+                                <span>Work Days:</span>
+                            </div>
+                            <div class="right-col">
+                                <div class="table-view">
+                                    <div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="SU" data-bind="checked: SelectedWorkDays" />
+                                            <span>Sun</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="MO" data-bind="checked: SelectedWorkDays" />
+                                            <span>Mon</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="TU" data-bind="checked: SelectedWorkDays" />
+                                            <span>Tue</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="WE" data-bind="checked: SelectedWorkDays" />
+                                            <span>Wed</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="TH" data-bind="checked: SelectedWorkDays" />
+                                            <span>Thu</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="FR" data-bind="checked: SelectedWorkDays" />
+                                            <span>Fri</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="SA" data-bind="checked: SelectedWorkDays" />
+                                            <span>Sat</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:5px 0 5px 0" data-bind="visible:IsEditMode && IsDeleteAvailable">
+                            <input type="checkbox" style="width:auto;" data-bind="visible:IsEditMode && IsDeleteAvailable,checked: IsDeleteSchedule" /><span> Delete Schedule</span>
+                        </div>
+                        <div class="table-row" data-bind="visible:false">
+                            <div class="col" ><span>Business Closures:</span></div>
+                            <div class="right-col" style="width:80%" ><input type="radio" name="BusinessColusreOption" value="OBS" data-bind="checked:BusinessClosure" /><span>Observe</span><input type="radio" name="BusinessColusreOption" value="DNO" data-bind="checked:BusinessClosure" /><span>Do not observe</span></div>
+                        </div>
+
+                        <div class="table-row">
+                            <div class="col" style="vertical-align:middle"><span>Date Range:</span></div>
+                            <div class="right-col">
+                                <div class="table-view">
+                                    <div class=" table-row">
+                                        <div class="right-col" style="vertical-align:middle;padding-left:5px;width:90px"><span>Starting On</span></div>
+                                        <div class="col"><input data-bind="field: 'dateRange',value: DateRange, type: AppUI.FieldType.date,required:'Date is required'" /></div>
+                                       
+                                        <div class="right-col" style="width:20px;vertical-align:middle;"><span>Until: </span></div>&nbsp;
+                                        <!--<span data-bind="visible:IsEditMode,text: $root.UntilDateString() == MAXDATE ? NOENDDATE : $root.UntilDateString"></span>-->
+                                        <div class="col"><input data-bind="field: 'untilDateString',value: UntilDateString, type: AppUI.FieldType.date" /></div>&nbsp;&nbsp;&nbsp;
+                                      
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-row" style="display:none">
+                            <div class="col"><span>Time Zone</span></div>
+                            <div class="right-col timezone"><input data-bind="field: $root.TimezoneValue, type: AppUI.FieldType.choice,choices: $root.TimeZone" /></div>
+                        </div>
+                        <div style="clear:both;">&nbsp;</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="schedule-work-hour" data-bind="visible:DailySchedule">
+        <div id="container">
+            <div class="tab_container">
+                <div id="tbWorkHour" class="tab_content">
+                    <div class="table-view">
+                        <div class="table-row">
+                            <div class="col">
+                                <span>Facility:</span>
+                            </div>
+                            <div class="right-col">
+                                <span data-bind="text: FacilityName"></span>
+                            </div>
+                        </div>
+                        <div class="table-row">
+                            <div class="col" style="width:20%"><h3>Select a Date</h3></div>
+                            <div class="right-col" style="vertical-align:middle;"><input data-bind="field:'selecteddate', value: selectedDate,  type: AppUI.FieldType.date,required:'Date is required'" /></div>
+                        </div>
+                    </div>
+                    <div class="workhour-toprow">
+                        <h3 class="work-hour-title">Enter work hours and breaks</h3>
+                        <!--<button class="show-capacity">Show Capacity >></button>-->
+                    </div>
+                    <div class="scroll-container">
+
+                        <div class="table-view">
+                            <div class="header-row">
+                                <div class="col">Type</div>
+                                <div class="col">Start </div>
+                                <div class="col">End</div>
+                                <div class="col"> </div>
+                            </div>
+                            <!-- ko foreach: ScheduleRows -->
+                            <div class="table-row">
+                                <!-- ko if : !($data.IsBreak())  -->
+                                <span class="col" style="width:135px;">Work Hours</span>
+                                <!-- /ko -->
+                                <!-- ko if : ($data.IsBreak())  -->
+                                <span class="col">Break</span>
+                                <!-- /ko -->
+                                <div class="col">
+                                    <input class="timeControl fixHeight" data-bind="field: $data.WorkStartTime, type: AppUI.FieldType.choice,choices: $root.TimeChoices,event: { change: $root.CalculateObservableChanges.bind($root,'Start',$index())} " />
+                                </div>
+                                <div class="col">
+                                    <input class="timeControl fixHeight" data-bind="field: $data.WorkEndTime, type:AppUI.FieldType.choice,choices: $root.TimeChoices,event: { change: $root.CalculateObservableChanges.bind($root,'End',$index())} " />
+                                </div>
+                                <!-- ko if : !($data.IsBreak())  -->
+                                <div class="col" style="width:120px;">
+                                    <button class="dummyClsAddSchedule" data-bind="event:{click:$root.AddItems.bind($root,$index())},enable: $data.ButtonStatus()"><span>Add Break</span> </button>
+                                </div>
+                                <!-- /ko -->
+                                <!-- ko if : ($data.IsBreak())  -->
+                                <div class="col">
+                                    <button class="dummyClsAddSchedule" data-bind="event:{click:$root.DeleteItems.bind($root,$index())}"><span>Delete</span></button>
+                                </div>
+                                <!-- /ko -->
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        
+                    </div>
+                    <div class="strip" style="background-color: lightgray;margin-bottom:40px;">Total:<label data-bind="text: Total"></label><label data-bind="text: TimeTypeTotal"></label>,Working: <label data-bind="text: Working"></label> <label data-bind="text: TimeTypeWorking"></label>,Breaks:<label data-bind="text: Breaks"></label> <label data-bind="text: TimeTypeBreaks"></label></div>
+                    <div data-bind="visible:IsEditMode && IsDeleteAvailable" style="padding-top:5px;margin-bottom:30px;">
+                        <input type="checkbox" style="width:auto;" data-bind="checked: IsDeleteSchedule,visible:IsEditMode && IsDeleteAvailable" /><span> Delete Schedule</span>
+                    </div>
+                    <div class="table-view" style="padding-top:5px;margin-bottom:80px; display:none">
+                        <div class="table-row">
+                            <div class="col" style="width:20%"><span>Time Zone</span></div>
+                            <div class="right-col timezone"><input data-bind="field: $root.TimezoneValue, type: AppUI.FieldType.choice,choices: $root.TimeZone" /></div>
+                        </div>
+                    </div>
+                    <div style="clear:both;">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-toolbar dock-bottom">
+        <button data-bind="onclick: SaveWorkHour.bind($root,0) ,enable: EnableSaveBtn">
+            <span>Save</span>
+        </button>
+        <button data-bind="onclick: SaveWorkHour.bind($root,1) ,enable: EnableSaveBtn">
+            <span>Save &amp; Close</span>
+        </button>
+    </div>
+</div></script>
+<script type="text/html" data-template="view" id="Scheduling-Provider-WorkHours-AddLocationPopup"><div class="scheduling-provider-workhours-addlocation-popup">
+    <!--<div id="agencyLocationsGrid" data-bind="EnableRowSelect:true"></div>-->
+    <div class="ccx-portal-grid" id="agencyLocationsGrid" style="height:240px;overflow-x:auto">
+        <table>
+            <colgroup>
+                <col style="width: 100px;" />
+                <col style="width: 150px;" />
+                <col style="width: 100px;" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>
+                        <span class="ccx-portal-grid-cell">Name</span>
+                    </th>
+                    <th>
+                        <span class="ccx-portal-grid-cell">Office Address</span>
+                    </th>
+                    <th>
+                        <span class="ccx-portal-grid-cell">Main Phone</span>
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ko foreach: $root.AgencyLocations -->
+                <tr class="ccx-portal-grid-row" data-bind="alternateClass: 'alternating', click: function(){$root.SelectRow($data);}, css: { 'selected': $root.SelectedLocation() === $data}">
+                    <td><span data-bind="text: $data.FacilityName, attr: {title : $data.FacilityName}"></span></td>
+                    <td><span data-bind="text: $data.OfficeAddress, attr: {title :$data.OfficeAddress}"></span></td>
+                    <td><span data-bind="text: $data.MainPhone, attr: {title :$data.MainPhone}"></span></td>
+
+                </tr>
+                <!-- /ko -->
+            </tbody>
+        </table>
+    </div>
+    <div class="form-toolbar" style="text-align:right;">
+        <button data-bind="onclick: SaveFacilityEquipementRecord,readonly:!IsEnable,enable: IsEnable">
+            <img alt="save & Close" src="Images/save.jpg" />
+            <span>Save &amp; Close</span>
+        </button>
+    </div>
+</div></script>
+<script type="text/html" data-template="view" id="Scheduling-Provider-WorkHours-CalendarView">
+
+<div class="scheduling-provider-workhours-calendar">
+
+    <div class="calendar-month-header">
+
+        <button title="Previous Month" data-bind="onclick: $root.prevMonth">&lt;</button>
+        <span class="month-header">
+            <span data-bind="text: $root.SelectedMonth()"></span>
+            <span>, </span>
+            <span data-bind="text: $root.SelectedDate().getFullYear()"></span>
+        </span>
+        <button title="Next Month" data-bind="event:{click: $root.nextMonth}">&gt;</button>
+
+        <span class="icon-toolbar">
+            <button title="Reload" data-bind="onclick: $root.reload.bind($root)">
+                <img alt="Reload" src="images/reload.png" />
+            </button>
+            <button title="Filter" id="FilterButton" data-bind="onclick: $root.filter.bind($root)">
+                <img id="FilterButtonImg"alt="Filter" src="images/menu.png" />
+            </button>
+        </span>
+        <div id="ddllocations"  class="Filter"> 
+            <!-- ko if: AppData.where($root.SelectedMonthLocations(), function(h){ return (h.IsActive==true); }).length<=0 -->
+            <span class="msg" data-bind="text: 'There is no facilities found.'"></span>
+            <!-- /ko -->
+            <ul class="ccx-tile-menu">
+                <!-- ko foreach: $root.SelectedMonthLocations -->                
+                <!-- ko if: IsActive -->
+                <li>
+                    <a class="locationTile blue" href="javascript:void(0)" data-bind="attr:{title:$data.LocationName}, onclick: $root.filterLocation.bind($root),style: {  'border-color':($data.BorderColorCode),'background-color':($data.Color)  } ">
+
+                        <span data-bind="text: PartialLocationName"></span>
+                    </a>
+                </li>
+                <!-- /ko -->
+                <!-- /ko -->
+             
+            </ul>
+
+        </div>
+
+    <div class="calendar-table">
+        <div class="calendar-week-header">
+            <div class="calendar-column">
+                <div class="week-header">Sunday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Monday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Tuesday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Wednesday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Thursday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Friday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Saturday</div>
+            </div>
+        </div>
+
+        <!-- ko foreach: CalendarRows -->
+
+        <div class="calendar-row">
+            <!-- ko foreach: Days -->
+
+            <div class="calendar-day" data-bind="'event':{click: function () {$root.HighLightSelection($root, event,$data,$index())}}">
+                <div class="calendar-cell" data-bind=" css:{'selected-month':IsCurrentMonth}">
+                    <!-- ko if: Day == 1 -->
+                    <div class="day-header" data-bind="text: $root.getMonthName(Date) + ' 1st'"></div>
+                    <!-- /ko -->
+                    <!-- ko if: Day > 1 -->
+                    <div class="day-header" data-bind="text: Day"></div>
+                    <!-- /ko -->
+                    <button class="add-button" title="Add" data-bind="onclick: $root.addItem.bind($root,Date)">
+                        <img alt="Add" src="images/add.png" />
+                    </button>
+
+                    <div class="day-schedule">
+                        <!-- ko foreach: AppData.where($root.WorkHours(), function(h){ return $root.daysAreEqual(h.Date,$data.Date); }) -->
+                        
+                        <div class="schedule-item" data-bind="
+                                                              'event': {
+                                                                  click:  $root.showRelated,
+                                                                  dblclick:$root.EditWorkHours.bind($root,$data, event, $index()),
+                                                                  contextmenu: function () {$root.EditWorkHours($data, event,$index)}
+                                                              },
+                                                              attr: {
+                                                                  'class': 'schedule-item link-' + ($data.LinkId || 'none'),
+                                                                  title: $root.formatTime(StartTime,true) +'-'+ $root.formatTime(EndTime,true) +' ' 
+                                                                  +$data.Location || $data.Reason || ''
+                                                              },
+                                                              css:{
+                                                                  'weekly':Type==Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Weekly,
+                                                                  'daily':Type==Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Daily,
+                                                                  'timeoff':Type==Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.TimeOff,
+                                                                  'break':Type==Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Break
+                                                              },style: {  'border-color':($data.BorderColor),'background-color':($data.Color)  }">
+
+                            <!-- ko if: !$data.IsAllDay -->
+                            <span data-bind="text:  $root.formatTime(StartTime,true) +'-'+ $root.formatTime(EndTime,true)+  '|' + PartialLocation"></span>
+                            <!-- /ko -->
+                            <!-- ko if: $data.IsAllDay -->
+                            <span>All Day</span>
+                            <!-- /ko -->
+                        </div>
+
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- /ko -->
+        </div>
+
+        <!-- /ko -->
+    </div>
+</div>
+</div></script>
+<script type="text/html" data-template="view" id="Scheduling-Provider-WorkHours-ScheduleLocationPopup">
+
+<div class="scheduling-provider-workhours-location-popup">
+    <h2>Select a location:</h2>
+
+    <div class="ccx-tile-menu">
+
+        <table data-bind="foreach: locations">  
+
+            <tr data-bind="foreach: $data">                
+                <td  >
+                    
+                    <a class="locationTile blue" href="javascript:void(0)" data-bind="attr:{title:$data.LocationName},click: function(){$root.select($data);},style: {  'border-color':($data.BorderColorCode),'background-color':($data.Color)  } ">
+                        <span data-bind="text: PartialLocationName"></span>
+                    </a> 
+
+                </td>
+            </tr>
+        </table>
+        
+    </div>
+    
+    <div class="form-toolbar" style="text-align:right;">
+        <button data-bind="click: function(){$root.select('Add New');}">
+            
+            <span>Add New</span>
+        </button>
+    </div>
+
+</div>
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Provider-WorkHours-ScheduleRecurrencePopup">
+
+<div class="scheduling-provider-workhours-recurrence-popup">
+
+    <h2>Select how much of the schedule you want to remove</h2>
+
+    <div class="ccx-tile-menu">
+
+        <a class="tile blue wide" href="javascript:void(0)" data-bind="click: function(){$root.select('Single');}">
+            <img alt="Date/Time" src="images/clock.png" />
+            <span>This date only: </span>
+            <span data-bind="text: AppData.formatDate(date)"></span>
+        </a>
+
+        <a class="tile blue wide" href="javascript:void(0)" data-bind="click: function(){$root.select('Remaining');}">
+            <img alt="Date/Time" src="images/clock.png" />
+            <span>From </span>
+            <span data-bind="text: AppData.formatDate(date)"></span>
+            <span> onward</span>
+        </a>
+
+        <a class="tile blue wide" href="javascript:void(0)" data-bind="click: function(){$root.select('All');}">
+            <img alt="Date/Time" src="images/clock.png" />
+            <span>Entire recurring weekly schedule from start to end</span>
+        </a>
+
+    </div>
+
+    <div class="form-toolbar">
+        <button data-bind="onclick: function(){AppUI.Popup.hideAll();CrmData.Common.enableHTMLScroll();}">
+            Cancel
+        </button>
+    </div>
+
+</div>
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Provider-WorkHours-ScheduleTypePopup">
+
+<div class="scheduling-provider-workhours-type-popup">
+
+    <h2>Select a schedule type:</h2>
+
+    <div class="ccx-tile-menu">
+
+        <a class="tile blue" href="javascript:void(0)" data-bind="click: function(){$root.select(Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Weekly);}">
+            <img alt="Date/Time" src="images/datetime.png" />
+            <span>Recurring Schedule</span>
+        </a>
+
+        <a class="tile blue" href="javascript:void(0)" data-bind="click: function(){$root.select(Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Daily);}">
+            <img alt="Date/Time" src="images/datetime.png" />
+            <span>Single Day Schedule</span>
+        </a>
+
+        <!--<a class="tile blue" href="javascript:void(0)" data-bind="click: function(){$root.select(Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.TimeOff);}">
+            <img alt="Date/Time" src="images/datetime.png" />
+            <span>Time Off</span>
+        </a>-->
+
+    </div>
+
+</div>
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Provider-WorkHours-WorkHourFlyout">
+
+<div class="scheduling-provider-workhours-detail">
+
+    <!-- ko if: Type == Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Weekly -->
+    <h2>Recurring Schedule</h2>
+    <!-- /ko -->
+
+    <!-- ko if: Type == Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Daily -->
+    <h2>Single Day Schedule</h2>
+    <!-- /ko -->
+
+    <!-- ko if: Type == Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.TimeOff -->
+    <h2>Time Off</h2>
+    <!-- /ko -->
+
+    <!-- ko if: Type == Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Break -->
+    <h2>Break</h2>
+    <!-- /ko -->
+
+
+    <div>
+        <label>Reason</label>
+        <input data-bind="field: 'Reason', type: AppUI.FieldType.text" />
+    </div>
+
+    <div>
+        <label>Location</label>
+        <input data-bind="field: 'Location', type: AppUI.FieldType.text" />
+    </div>
+
+    <div>
+        <label>Date</label>
+        <input data-bind="field: 'Date', type: AppUI.FieldType.date" />
+    </div>
+
+    <div>
+        <input data-bind="field: 'IsAllDay', type: AppUI.FieldType.toggle, choices: [{Text:'All Day',Value:true},{Text:'Specified Time',Value:false}]" />
+    </div>
+
+    <div data-bind="toggle: 'IsAllDay', condition: function(p){ return !p; }">
+        <label>Start Time</label>
+        <input data-bind="field: 'StartTime', type: AppUI.FieldType.time" />
+    </div>
+
+    <div data-bind="toggle: 'IsAllDay', condition: function(p){ return !p; }">
+        <label>End Time</label>
+        <input data-bind="field: 'EndTime', type: AppUI.FieldType.time" />
+    </div>
+
+    <div class="form-toolbar">
+        <button style="float:left;background:none;border:none;" title="Remove" data-bind="onclick: REMOVE_ITEM_DELEGATE_TEMP">
+            <img alt="Remove" src="images/remove.png" />
+        </button>
+        <button data-bind="onclick: function(){$(document).click()}">
+            OK
+        </button>
+        <button data-bind="onclick: function(){$(document).click()}">
+            Cancel
+        </button>
+    </div>
+
+</div>
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Samples-SidebarSampleView">
+
+<div class="ccx-page">
+
+    <div class="page-header">
+
+
+    </div>
+
+</div>
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Schedule-AppointmentFlyout"><style>
+    .left
+    {
+        float: left;
+        padding-right: 10px;
+        width: 50%;
+    }
+
+    .right
+    {
+        float: left;
+        padding-left: 10px;
+        width: 50%;
+    }
+    .time-schedule select, .time-schedule span { 
+    font-size: 11px;
+    padding: 1px;
+    width: 220px;
+}
+.time-schedule input[type=checkbox] {width:auto;border:0;}
+.time-schedule ul {list-style:none;margin:0;padding:0;}
+.time-schedule ul li {padding:5px 0;}
+.time-schedule label {width: 120px;display: inline-block;}
+
+.time-schedule .calendar {
+    margin: 0 5px;
+    position: relative;
+    top: 5px;
+	
+}
+.time-schedule h1 {font-size: 25px; font-weight: 500;}
+</style>
+
+<div class="time-schedule">
+
+
+    <h2>Appointment Details</h2>
+    <ul>
+        <li><label>Date</label><span data-bind="text: AppData.formatDate($root.SelectedData().scheduledstart)"></span></li>
+        <li><label>Time</label><span data-bind="text: $root.formatTime($root.SelectedData().scheduledstart,true) +'-'+ $root.formatTime($root.SelectedData().scheduledend,true)"></span></li>       
+        <li><label>Subject</label><span data-bind="text: $root.SelectedData().subject"></span></li>
+        <li><label>Patient</label><span data-bind="text: $root.SelectedData().regardingobjectidname"></span></li>
+        
+        <!--<li><label>Location</label><span data-bind="text: $root.SelectedData().location"></span></li>-->
+    </ul>
+    
+ 
+    <div class="form-toolbar">
+
+        <button data-bind="onclick: function(){$(document).click()}">
+            Edit
+        </button>
+       
+    </div>
+    <div class="form-toolbar">
+
+      
+        <button data-bind="onclick: function(){$(document).click()}">
+            Remove Hold
+        </button>
+        
+    </div>
+    <div class="form-toolbar">
+
+       
+        <button data-bind="onclick: function(){$(document).click()}">
+            Schedule Hold
+        </button>
+    </div>
+
+</div>
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Schedule-AppointmentMonth"> 
+<style>
+   
+</style>
+<div class="scheduling-provider-appointmenthours-appointment">
+
+    
+    <div>
+        <div class="calendar-table">
+            <div class="calendar-week-header">
+                <div class="calendar-column">
+                    <div class="week-header">Sunday</div>
+                </div>
+                <div class="calendar-column">
+                    <div class="week-header">Monday</div>
+                </div>
+                <div class="calendar-column">
+                    <div class="week-header">Tuesday</div>
+                </div>
+                <div class="calendar-column">
+                    <div class="week-header">Wednesday</div>
+                </div>
+                <div class="calendar-column">
+                    <div class="week-header">Thursday</div>
+                </div>
+                <div class="calendar-column">
+                    <div class="week-header">Friday</div>
+                </div>
+                <div class="calendar-column">
+                    <div class="week-header">Saturday</div>
+                </div>
+            </div>
+
+            <!-- ko foreach: CalendarRows -->
+
+            <div class="calendar-row">
+                <!-- ko foreach: Days -->
+
+                <div class="calendar-day">
+                    <div class="calendar-cell" style="height:200px !important" data-bind="css:{'selected-month':IsCurrentMonth}">
+                        <!-- ko if: Day == 1 -->
+                        <div class="day-header" data-bind="text: $root.getMonthName(Date) + ' 1st'"></div>
+                        <!-- /ko -->
+                        <!-- ko if: Day > 1 -->
+                        <div class="day-header" data-bind="text: Day"></div>
+                        <!-- /ko -->
+                        <div class="day-schedule">
+                            <!-- ko foreach: AppData.where($root.allAppointments(), function(h){ return $root.daysAreEqual(h.scheduledstart,$data.Date); }) -->
+                            <!-- ko if:  $index() <= 4 -->
+                            <div class="schedule-item" data-bind="style: {'height':(($data.scheduledend-$data.scheduledstart)/(1000*60*60*24))*205, 'border-color':($data.bordercolorcode),'background-color':($data.color)}">
+                                <div data-bind="title: $root.hoverValues(scheduledstart,subject,name+(($data.scheduledend-$data.scheduledstart)/(1000*60*60*24))*205),
+                                                                flyout:'Scheduling-Schedule-AppointmentFlyout',
+                                                                context:new Ccx.Scheduling.ViewModels.Schedule.AppointmentFlyoutViewModel($data),
+                                                                'event': {
+                                                                  mouseover: $root.showRelated,
+                                                                  mouseout: $root.hideRelated
+                                                              } ">
+
+                                    <span data-bind="text:  $root.formatTime(scheduledstart,true) +'-'+ $root.formatTime(scheduledend,true)+  '|' + name"></span>
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                            <!-- ko if:  $index() > 4 -->
+                            <div style="text-align:right;padding-top:3px;">
+                                <button style="text-align:right;width:6px;height:10px;" title="Arrow">
+                                    <img alt="arrow" src="data:image/png;base64,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">
+                                </button>
+                            </div>
+                            <!-- /ko -->
+                            <!-- /ko -->
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /ko -->
+            </div>
+
+            <!-- /ko -->
+        </div>
+    </div>
+</div>
+
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Schedule-AppointmentView"><div class="AppointmentViewHeader">
+    <div class="buttonbar">
+
+        <span>View by</span>
+        <span class="left-toolbar">
+            <button name="viewButtons" class="dayView" data-bind="onclick:$root.selectedView.bind($root,'Day')">Day</button>
+            <button name="viewButtons" class="weekView" data-bind="onclick:$root.selectedView.bind($root,'Week')">Week</button>
+            <button name="viewButtons" class="monthView" data-bind="onclick:$root.selectedView.bind($root,'Month')">Month</button>
+            <!--<a class="menu-item button"><span>Day</span></a>
+            <a class="menu-item button"><span>Week</span></a>
+            <a class="menu-item button"><span>Month</span></a>-->
+        </span>
+    </div>
+    <div class="AppointmentType-container">
+
+        <button title="Previous Week" data-bind="click:$root.CurrentView().OnPreviousClick">&lt;</button>
+        <span class="AppointmentType-header">
+            <span data-bind="text: $root.CurrentView().HeaderText"></span>
+        </span>
+        <button title="Next Week" data-bind="click:$root.CurrentView().OnNextClick">&gt;</button>
+    </div>
+
+    <div>
+        <span class="icon-toolbar">
+            <button title="Reload" data-bind="click:$root.CurrentView().OnRefreshClick">
+                <img alt="Reload" src="images/reload.png" />
+            </button>
+            <button title="Filter" id="FilterButton" data-bind="onclick: $root.filter.bind($root)">
+                <img id="FilterButtonImg" alt="Filter" src="images/menu.png" />
+            </button>
+        </span>
+        <div id="ddllocations" class="Filter">
+
+            <ul class="ccx-tile-menu">
+                <!-- ko foreach: $root.CurrentView().ProviderLocations -->
+                <li>
+
+                    <a class="locationTile blue" href="javascript:void(0)" data-bind="attr:{title:$data.LocationName}, onclick: $root.CurrentView().OnLocationSelected.bind($root),style: {  'border-color':($data.BorderColorCode),'background-color':($data.Color)  } ">
+                        <span data-bind="text: PartialLocationName"></span>
+                    </a>
+                </li>
+                <!-- /ko -->
+            </ul>
+
+        </div>
+    </div>
+
+</div>
+<div id="selectedViewContent"></div>
+
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Schedule-AppointmentWeekly">
+<div class="scheduling-provider-appointmenthours-appointmentweekly">
+    <div class="calendar-header">
+        <div class="header-container">
+
+            <div class="calendar-header-row">
+                <div class="calendar-header-timecell"></div>
+                <!-- ko foreach:weekdays -->
+                <div class="calendar-header-daycell">
+                    <span data-bind="text:$data.getDate()" style="font-weight:bold;float:left;margin-left:2px"></span>
+                    <span data-bind="text:CrmData.WeekDays[$data.getDay()]"></span>
+                </div>
+                <!-- /ko -->
+            </div>
+
+        </div>
+    </div>
+    <!-- the calendar's body -->
+    <div class="calendar-body">
+
+        <div class="body-container">
+            <div class="calendar-timeCol"></div>
+            <div class="calendar-weeksCol"></div>
+            <div class="calendar-row-timecontainer">
+                <div class="calendar-row-timetable">
+                    <!-- ko foreach:timings -->
+                    <!-- ko if:!$data.IsHalfPastHour() -->
+                    <div class="calendar-row" data-bind="attr: { id: 'tr_' + $index() }">
+                        <div class="calendar-row-timecell" style="vertical-align:top">
+                            <span data-bind="text:hour" style="font-size:large;font-weight:bold"></span>
+                            <span data-bind="text:suffix" style="vertical-align:super;font-weight:lighter"></span>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+            </div>
+            <div class="calendar-row-daycontainer">
+                <div class="calendar-row-daytable">
+                    <div class="rows">
+                        <!-- ko foreach:timings -->
+                        <div class="calendar-row" data-bind="value:$data,attr:{id:'timeRow_' + $data.hour}">
+                            <!-- ko foreach:$root.weekdays -->
+                            <div class="calendar-row-daycell" data-bind="click:$root.onCellClick,attr:{id:'cell_'+$parent.hour+'_'+$data.getDate()}">
+                                <!-- ko if:($parent.hour.indexOf(':30')<0) -->
+                                <!-- ko foreach:AppData.where($root.weekAppointments(), function(h){ return $root.isCurrentTimeSlotAppointment($parent,$data,h); }) -->
+                                <div class="user-appointment" data-bind="title:title,style:{height:$data.scheduleddurationminutes + 'px',top:((new Date(scheduledstart)).getMinutes() + 1) + 'px','border-color':  $data.bordercolorcode()},attr:{location:$data.equipmentid}">
+                                    <div class="user-appointment-content" data-bind="style:{height:$data.scheduleddurationminutes + 'px','background-color':$data.color()}">
+                                        <div data-bind="text:$data.subject+', '+$data.location,style:{'font-size':($data.scheduleddurationminutes<=15)?'small':'normal'}"></div>
+                                    </div>
+                                </div>
+                                <!-- /ko -->
+                                <!-- /ko -->
+
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+</script>
+<script type="text/html" data-template="view" id="Scheduling-Schedule-ScheduleType"><div id="container" class="scheduling-EditSchedulePopup">
+ 
+    <p class="global-text">The work hours you selected are part of a recurring weekly schedule.</p>
+    <p class="global-text"><strong>Select how much of the schedule you want to edit</strong></p>
+    <div class="date-strip-container">
+        <span class="pull-left">
+            <input type="radio" name="radiobutton" value="0" data-bind="checked: ScheduleType" />
+        </span> <span class="date-title" data-bind="text:'This date only: '+SelectedDate()"> </span>
+        <div style="clear:both;"></div>
+        <div class="date-strip">
+            <div class="blue blue-none blue-half-width">
+                <ul>
+                    <li class="blue-bg"><span class="date-control"><span class="date" data-bind="text:SelectedDate"></span></span></li>  
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="date-strip-container">
+        <span class="pull-left">
+            <input type="radio" name="radiobutton" value="1" data-bind="checked: ScheduleType, enable: IsNotStartDateofRecurrence" />
+        </span> <span class="date-title" data-bind="text:'From: '+SelectedDate()"></span>
+        <div style="clear:both;"></div>
+        <div class="date-strip">
+            <div class="blue blue-half-width">
+                <ul>
+                    <li class="blue-bg"><span class="date-control"><span class="date" data-bind="text:SelectedDate"></span></span></li> 
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="date-strip-container">
+        <span class="pull-left">
+            <input type="radio" name="radiobutton" value="2" data-bind="checked: ScheduleType" />
+        </span> <span class="date-title">Entire recurring weekly schedule from start to end</span>
+        <div style="clear:both;"></div>
+        <div class="date-strip">
+            <div class="blue blue-full-width">
+                <ul>
+                    <li class="blue-bg"><span class="date-control"><span class="date" data-bind="text:ScheduleStartedDate"></span></span></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+        <div class="footer-buttons">
+            <button data-bind="onclick:Close" >Cancel</button>
+            <button data-bind="onclick:ShowSchedule">Ok</button>
+        </div>
+
+    </div>
+</div>
+
+
+
+</script>

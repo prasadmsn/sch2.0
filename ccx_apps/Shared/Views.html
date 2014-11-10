@@ -1,0 +1,511 @@
+<script type="text/html" data-template="view" id="Ccx-Dashboard">
+
+    <h1>CoCENTRIX Shared Application</h1>
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-Flow">
+
+    <div class="ccx-app-flow">
+
+        <div class="flow-header">
+            <h3 data-bind="text: Title, visible: Title"></h3>
+            <div class="flow-breadcrumb" data-bind="visible: ShowBreadcrumb">
+                <!-- ko foreach: Breadcrumbs -->
+                <a href="javascript:void(0)" data-bind="onclick: $root.SelectBreadcrumb">
+                    <!-- ko if: Image -->
+                    <img data-bind="attr: { src: Image(), alt: Title() }" />
+                    <!-- /ko -->
+                    <!-- ko if: Title -->
+                    <span data-bind="text: Title"></span>
+                    <!-- /ko -->
+                </a>
+                <!-- /ko -->
+            </div>
+        </div>
+
+        <div class="flow-content">
+            <!-- ko with: CurrentStep -->
+            <div data-bind="view: View, context: ViewModel"></div>
+            <!-- /ko -->
+        </div>
+
+        <div class="flow-footer">
+            <div class="flow-navigation" data-bind="visible: ShowNavigation">
+
+                <a class="flow-back" href="javascript:void(0)" data-bind="onclick: GoBack, enabled: CanGoBack, css: { 'ccx-disabled': !CanGoBack() }">
+                    <span data-bind="text: BackLabel"></span>
+                </a>
+
+                <div class="flow-index">
+                    <span data-bind="text: CurrentStepNumber"></span>
+                    <span> of </span>
+                    <span data-bind="text: StepCount"></span>
+                </div>
+
+                <a class="flow-next" href="javascript:void(0)" data-bind="onclick: GoNext, enabled: CanGoNext, css: { 'ccx-disabled': !CanGoNext() }">
+                    <span data-bind="text: NextLabel"></span>
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-Form">
+
+    <div class="responsive-form">
+        <!-- ko foreach: View.Sections -->
+        <fieldset>
+            <legend data-bind="text: Title"></legend>
+            <!-- ko foreach: Groups -->
+            <div class="responsive-row" data-bind="alternateClass: 'alternating'">
+                <!-- ko foreach: Fields -->
+                <div class="responsive-field" data-bind="css: { 'no-label': NoLabel, 'required': Required, 'split': SplitField }">
+                    <label data-bind="attr: { 'for': FieldId }">
+                        <span class="field-label-text" data-bind="text: Label"></span>
+                        <span class="field-required-indicator" data-bind="html: $root.FieldRequiredIndicator, visible: Required"></span>
+                    </label>
+                    <div class="field-container" data-bind="html: $root.RenderField($data)"></div>
+                    <div class="field-validation-error" data-bind="text: ValidationError, visible: ShowValidationError"></div>
+                    <div class="field-comment" data-bind="text: Comment, visible: ShowComment"></div>
+                </div>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        </fieldset>
+        <!-- /ko -->
+
+        <div class="form-error" data-bind="text: FormErrors, visible: ShowFormErrors"></div>
+
+        <div class="form-error" data-bind="text: FormErrors, visible: ShowFormErrors"></div>
+
+    </div>
+
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-Grid-Pager">
+    <!-- ko with: $root -->
+    <div class="ccx-portal-grid-filter">
+        <span class="ccx-portal-grid-filter-item" title="Clear Search" data-bind="visible: SearchString, text: SearchString, click: ClearSearchString.bind($root)"></span>
+    </div>
+    <div class="ccx-portal-grid-pager">
+        <a href="javascript:void(0);" data-bind="css: { 'disabled': NoPrevPage }, click: prevPage.bind($root)">
+            « Previous
+        </a>
+        <span data-bind="text: 'Page ' + PageNumber() + ' of ' + PageCount()"></span>
+        <span data-bind="text: ' (' + RecordCount() + ' records)'"></span>
+        <a href="javascript:void(0);" data-bind="css: { 'disabled': NoNextPage }, click: nextPage.bind($root)">
+            Next »
+        </a>
+    </div>
+    <div class="ccx-ui-loading" data-bind="css: { 'ccx-ui-loading visible': IsDataLoading }"></div>
+    <!-- /ko -->
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-Grid-Table">
+    <table>
+        <thead>
+            <tr>
+                <!-- ko if: View.EnableMultiSelect -->
+                <th width="20" class="ccx-portal-grid-multi-select">
+                    <input type="checkbox" data-bind="checked: SelectedAll" />
+                </th>
+                <!-- /ko -->
+                <!-- ko foreach: View.Columns -->
+                <th data-bind="sort: ($parent.View.EnablePaging && EnableSorting? PropertyName: null)">
+                    <span data-bind="text: Header"></span>
+                </th>
+                <!-- /ko -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- ko foreach: Results -->
+            <!-- ko if: !$parent.View.ShowSelectionPreview || $parent.View.DontHideSelectedItems || ($parent.View.EnableMultiSelect && !IsSelected()) -->
+            <tr class="ccx-portal-grid-row" data-bind="alternateClass: ($parent.View.EnableMultiSelect && !$parent.View.ShowSelectionPreview? '':'alternating'), 'event': {'mousedown': ($parent.View.EnableRowSelect && !$data.PreSelected? $parent.selectRow.bind($parent): null)}">
+                <!-- ko if: $parent.View.EnableMultiSelect -->
+                <td class="ccx-portal-grid-multi-select">
+                    <!-- ko if: $data.PreSelected -->
+                    <input type="checkbox" data-bind="checked: true, enable: false" />
+                    <!-- /ko -->
+                    <!-- ko if: !$data.PreSelected -->
+                    <input type="checkbox" data-bind="checked: IsSelected" />
+                    <!-- /ko -->
+                </td>
+                <!-- /ko -->
+                <!-- ko foreach: $parent.View.Columns -->
+                <td>
+                    <!-- ko if: ClientTemplate && PropertyName -->
+                    <!-- ko with: $parent[PropertyName] -->
+                    <div class="ccx-portal-grid-cell" data-bind="template: $parent.ClientTemplate"></div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko if: ClientTemplate && !PropertyName -->
+                    <!-- ko with: $parent -->
+                    <div class="ccx-portal-grid-cell" data-bind="template: $parent.ClientTemplate"></div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko if: !ClientTemplate -->
+                    <span class="ccx-portal-grid-cell" data-bind="text: $parent[PropertyName]"></span>
+                    <!-- /ko -->
+                </td>
+                <!-- /ko -->
+            </tr>
+            <!-- /ko -->
+            <!-- /ko -->
+        </tbody>
+        <!-- ko if: View.EnablePaging -->
+        <tfoot>
+            <tr>
+                <td data-bind="attr: {colspan: (View.EnableMultiSelect? View.Columns.length + 1: View.Columns.length)}">
+                    <div class="ccx-portal-grid-filter">
+                        <span class="ccx-portal-grid-filter-item" title="Clear Search" data-bind="visible: SearchString, text: SearchString, click: ClearSearchString.bind($root)"></span>
+                    </div>
+                    <div class="ccx-portal-grid-pager">
+                        <a href="javascript:void(0);" data-bind="css: { 'disabled': NoPrevPage }, click: prevPage.bind($root)">
+                            « Previous
+                        </a>
+                        <span data-bind="text: 'Page ' + PageNumber() + ' of ' + PageCount()"></span>
+                        <span data-bind="text: ' (' + RecordCount() + ' records)'"></span>
+                        <a href="javascript:void(0);" data-bind="css: { 'disabled': NoNextPage }, click: nextPage.bind($root)">
+                            Next »
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
+        <!-- /ko -->
+    </table>
+
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-Grid">
+
+    <div data-bind="css: { 'ccx-portal-grid': true, 'multi-select-preview': View.ShowSelectionPreview }">
+        <!-- ko if: View.EnableSearching || Grid.Views.length > 1 -->
+        <header>
+            <!-- ko if: View.EnableSearching -->
+            <input class="ccx-ui-search" placeholder="Search" data-bind="value: SearchString" onkeyup="if((event.keyCode || event.which) == 13) $(this).blur();" />
+            <!-- /ko -->
+            <!-- ko if: Grid.Views.length > 1 && !View.ShowSelectionPreview && Grid.ShowViewSelection -->
+            <div class="ccx-portal-grid-views">
+                <select data-bind="value: SelectedViewIndex">
+                    <!-- ko foreach: Grid.Views -->
+                    <option data-bind="attr: { value: $index() + 1 }, text: Name"></option>
+                    <!-- /ko -->
+                </select>
+            </div>
+            <!-- /ko -->
+            <!-- ko if: View.EnableMultiSelect && View.ShowSelectionPreview -->
+            <h3 class="ccx-portal-grid-view-title" data-bind="text: View.Name"></h3>
+            <h3 class="ccx-portal-grid-view-selected" data-bind="text: Grid.SelectedItemsMessage"></h3>
+            <!-- /ko -->
+        </header>
+        <!-- /ko -->
+        <div class="ccx-portal-grid-container">
+            <!-- ko if: Results().length > 0 -->
+            <div class="ccx-portal-grid-table" data-bind="template: 'Ccx-App-Grid-Table'"></div>
+            <!-- /ko -->
+            <!-- ko if: View.EnableMultiSelect && View.ShowSelectionPreview -->
+            <div class="ccx-portal-grid-preview" data-bind="with: MultiSelectViewModel">
+                <!-- ko if: Results() && Results().length > 0 -->
+                <div data-bind="template: 'Ccx-App-Grid-Table'"></div>
+                <!-- /ko -->
+                <!-- ko if: Results() && Results().length == 0 -->
+                <h4 data-bind="text: Grid.NoSelectionMessage"></h4>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+            <!-- ko if: Results().length == 0 -->
+            <h4 data-bind="text: Grid.NoResultsMessage"></h4>
+            <!-- /ko -->
+        </div>
+        <div class="ccx-ui-loading" data-bind="css: { 'ccx-ui-loading visible': IsDataLoading }"></div>
+    </div>
+
+    <!-- ko if: Grid.Buttons && Grid.Buttons.length > 0 -->
+    <div class="ccx-portal-form-toolbar">
+        <!-- ko foreach: Grid.Buttons -->
+        <button data-bind="onclick: $root.invokeAction.bind($root,Action)">
+            <span data-bind="text: Text"></span>
+        </button>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-List">
+
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-Lookup">
+
+    <div class="lookup" data-bind="visible: LookupVisible">
+        <h4 class="result-header" data-bind="visible: SearchResultExpression">
+            <span class="found" data-bind="text: SearchResultExpression"></span>
+            <span class="not-found" data-bind="text: NonSearchResultExpression"></span>
+        </h4>
+        <div class="result-list">
+            <!-- ko foreach: Results -->
+            <div class="list-item" data-bind="event: { mousedown: $parent.selectItem.bind($parent, $data) }, alternateClass: 'alternating'">
+                <span data-bind="text: Text, attr: { title: Text.length>50? Text: '' }"></span>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- ko if: Results().length == 0 -->
+        <h4 data-bind="visible: SearchResultExpression">No Results Found</h4>
+        <h4 data-bind="visible: !SearchResultExpression()">Start typing to search</h4>
+        <!-- /ko -->
+        <div class="ccx-ui-loading visible" data-bind="visible: IsSearching"></div>
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-Menu">
+    <div class="ccx-portal-menu">
+        <!-- ko if: $data.Title -->
+        <h2 data-bind="text: $data.Title"></h2>
+        <!-- /ko -->
+        <!-- ko foreach: Items -->
+        <a data-bind="click: Action.bind($root, $data), css: AppUI.Menu.getItemColorClass($data)">
+            <!-- ko if: $data.Icon -->
+            <img data-bind="attr: { src: $data.Icon, alt: Text }" />
+            <!-- /ko -->
+            <span data-bind="text: Text"></span>
+        </a>
+        <!-- /ko -->
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-App-Tree">
+
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Action">
+
+    <div class="page-action">
+
+        <!-- ko foreach: $data.slice(0,4) -->
+        <a data-bind="click: function(d) { if(d.page) { App.Navigation.go(d.page,d.data); } }">
+            <!-- ko if: $data.icon -->
+            <img data-bind="attr: { src: $data.icon, alt: title }" />
+            <!-- /ko -->
+            <span class="title" data-bind="text: title"></span>
+        </a>
+        <!-- /ko -->
+        <!-- ko if: $data.length > 4 -->
+        <div class="more" data-bind="click: function(d) { $('.more-items').slideToggle('fast'); }">
+            <span>...</span>
+        </div>
+        <div class="more-items">
+            <!-- ko foreach: $data.slice(4) -->
+            <a data-bind="click: function(d) { if(d.page) { App.Navigation.go(d.page,d.data); } }">
+                <!-- ko if: $data.icon -->
+                <img data-bind="attr: { src: $data.icon, alt: title }" />
+                <!-- /ko -->
+                <span class="title" data-bind="text: title"></span>
+            </a>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Chart">
+
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Dashboard">
+
+    <div class="ccx-dashboard">
+
+        <!-- ko foreach: $data -->
+        <div class="page-column">
+
+            <!-- ko if: $data.title -->
+            <h2 class="title" data-bind="text: title"></h2>
+            <!-- /ko -->
+            <!-- ko if: $data.tiles -->
+            <div data-bind="view: 'Ccx-Page-Tile', context: $data.tiles, effect: true"></div>
+            <!-- /ko -->
+            <!-- ko if: $data.content -->
+            <!-- ko foreach: content -->
+            <!-- ko if: $data.title -->
+            <h3 class="title" data-bind="text: title"></h3>
+            <!-- /ko -->
+            <!-- ko if: $data.chart -->
+            <div data-bind="view: 'Ccx-Page-Chart', context: $data.chart"></div>
+            <!-- /ko -->
+            <!-- ko if: $data.fields -->
+            <div data-bind="view: 'Ccx-Page-Field', context: $data"></div>
+            <!-- /ko -->
+            <!-- ko if: $data.grid -->
+            <div data-bind="view: AppUI.Grid.View, context: $data.grid"></div>
+            <!-- /ko -->
+            <!-- ko if: $data.list -->
+            <div data-bind="view: 'Ccx-App-List', context: $data.list"></div>
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+
+        </div>
+        <!-- /ko -->
+
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Field">
+    <!-- ko foreach: $data -->
+    <div class="field" data-bind="css: { required: $data.required, 'no-label': !$data.label }">
+
+        <!-- ko if: $data.label -->
+        <label data-bind="text: label"></label>
+        <!-- /ko -->
+
+        <div class="control">
+            <!-- ko if: !$data.type -->
+            <input type="text" data-bind="value: $data.value" />
+            <!-- /ko -->
+            <!-- ko if: $data.type='number' -->
+            <input type="text" data-bind="num: $data.value" />
+            <!-- /ko -->
+            <!-- ko if: $data.type='decimal' -->
+            <input type="text" data-bind="num: $data.value, decimal: true" />
+            <!-- /ko -->
+            <!-- ko if: $data.type='text' -->
+            <textarea data-bind="value: $data.value"></textarea>
+            <!-- /ko -->
+            <!-- ko if: $data.type='list' && $data.options -->
+            <input type="text" data-bind="value: $data.value, choices: $data.choices" />
+            <!-- /ko -->
+            <!-- ko if: $data.type='list' && $data.choices -->
+            <input type="text" data-bind="value: $data.value, choices: $data.choices, multiple: true" />
+            <!-- /ko -->
+        </div>
+
+    </div>
+    <!-- /ko -->
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Grid">
+
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Layout">
+
+    <div class="ccx-page">
+
+        <div class="page-header">
+
+            <!-- ko if: App.Navigation.Current.views.length > 0 -->
+            <a class="back" data-bind="click: function(d) { App.Navigation.goBack(); }"></a>
+            <!-- /ko -->
+
+            <h1 class="title" data-bind="text: title, css: { 'no-back': App.Navigation.Current.views.length == 0 }"></h1>
+
+            <!-- ko if: $data.actions -->
+            <div data-bind="view: 'Ccx-Page-Action', context: actions"></div>
+            <!-- /ko -->
+            <!-- ko if: $data.tabs -->
+            <div data-bind="view: 'Ccx-Page-Tab', context: tabs"></div>
+            <!-- /ko -->
+            <!-- ko if: $data.nav -->
+            <div data-bind="view: 'Ccx-Page-Nav', context: nav"></div>
+            <!-- /ko -->
+            <!-- ko if: $data.steps -->
+            <div data-bind="view: 'Ccx-Page-Step', context: steps"></div>
+            <!-- /ko -->
+
+        </div>
+
+        <div class="page-content">
+            <!-- ko if: $data.columns -->
+            <div data-bind="view: 'Ccx-Page-Dashboard', context: columns"></div>
+            <!-- /ko -->
+        </div>
+
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-List">
+
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Nav">
+
+    <div class="page-nav">
+
+        <!-- ko foreach: $data -->
+        <a data-bind="css: { selected: AppData.makeObservable($data,'selected') }, click: function(d) { if(d.page) { App.View.load({ViewName:d.page,ViewContext:d.data},$('.page-content')[0]); d.selected(true); } }">
+
+            <!-- ko if: $data.icon -->
+            <img data-bind="attr: { src: $data.icon, alt: title }" />
+            <!-- /ko -->
+
+            <span class="title" data-bind="text: title"></span>
+
+            <!-- ko if: $data.items -->
+            <div class="preview">
+                <!-- ko foreach: items -->
+                <span class="item" data-bind="text: $data"></span>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        </a>
+        <!-- /ko -->
+
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Step">
+
+    <div class="page-step">
+
+        <!-- ko foreach: $data -->
+        <a data-bind="css: { selected: AppData.makeObservable($data,'selected') }, click: function(d) { if(d.page) { App.View.load({ViewName:d.page,ViewContext:d.data},$('.page-content')[0]); d.selected(true); } }">
+            <!-- ko if: $data.icon -->
+            <img data-bind="attr: { src: $data.icon, alt: title }" />
+            <!-- /ko -->
+            <span class="title" data-bind="text: title"></span>
+        </a>
+        <!-- /ko -->
+
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Tab">
+
+    <div class="page-tab">
+
+        <!-- ko foreach: $data -->
+        <a data-bind="css: { selected: AppData.makeObservable($data,'selected') }, click: function(d) { if(d.page) { App.View.load({ViewName:d.page,ViewContext:d.data},$('.page-content')[0]); d.selected(true); } }">
+            <span class="title" data-bind="text: $data.title"></span>
+        </a>
+        <!-- /ko -->
+
+    </div>
+</script>
+<script type="text/html" data-template="view" id="Ccx-Page-Tile">
+    <!-- ko foreach: $data -->
+    <div class="tile" data-bind="click: function(d) { if(d.page) { App.View.load({ViewName:d.page,ViewContext:d.data}); } },
+    attr: {
+        style: ($data.color? 'background-color:'+$data.color: '')
+    },
+    css: {
+        large: $data.large,
+        wide: $data.wide,
+        small: $data.small,
+        box: (!$data.large && !$data.wide && !$data.small)
+    }">
+
+        <!-- ko if: $data.icon -->
+        <img data-bind="attr: { src: $data.icon, alt: $data.title }" />
+        <!-- /ko -->
+        <!-- ko if: $data.title -->
+        <div class="title" data-bind="text: title"></div>
+        <!-- /ko -->
+        <!-- ko if: $data.button1 -->
+        <button class="first" data-bind="click: button1.action">
+            <!-- ko if: button1.icon -->
+            <img data-bind="attr: { src: button1.icon }" alt="" />
+            <!-- /ko -->
+            <!-- ko if: button1.title -->
+            <span class="title" data-bind="text: button1.title"></span>
+            <!-- /ko -->
+        </button>
+        <!-- /ko -->
+        <!-- ko if: $data.button2 -->
+        <button class="last" data-bind="click: button2.action">
+            <!-- ko if: button2.icon -->
+            <img data-bind="attr: { src: button2.icon }" alt="" />
+            <!-- /ko -->
+            <!-- ko if: button2.title -->
+            <span class="title" data-bind="text: button2.title"></span>
+            <!-- /ko -->
+        </button>
+        <!-- /ko -->
+
+    </div>
+    <!-- /ko -->
+</script>

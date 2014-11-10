@@ -1,0 +1,71 @@
+﻿<style>
+    .left
+    {
+        float: left;
+        padding-right: 10px;
+        width: 50%;
+    }
+
+    .right
+    {
+        float: left;
+        padding-left: 10px;
+        width: 50%;
+    }
+    .time-schedule select, .time-schedule span { 
+    font-size: 11px;
+    padding: 1px;
+    width: 220px;
+}
+.time-schedule input[type=checkbox] {width:auto;border:0;}
+.time-schedule ul {list-style:none;margin:0;padding:0;}
+.time-schedule ul li {padding:5px 0;}
+.time-schedule label {width: 120px;display: inline-block;}
+
+.time-schedule .calendar {
+    margin: 0 5px;
+    position: relative;
+    top: 5px;
+	
+}
+.time-schedule h1 {font-size: 25px; font-weight: 500;}
+</style>
+
+<div class="time-schedule">
+
+
+    <h2>Appointment Details</h2>
+    <ul>
+        <li><label>Date</label><span data-bind="text: AppData.formatDate($root.SelectedData().scheduledstart)"></span></li>
+        <li><label>Time</label><span data-bind="text: $root.formatTime($root.SelectedData().scheduledstart,true) +'-'+ $root.formatTime($root.SelectedData().scheduledend,true)"></span></li>       
+        <li><label>Subject</label><span data-bind="text: $root.SelectedData().subject"></span></li>
+        <li><label>Patient</label><span data-bind="text: $root.SelectedData().regardingobjectidname"></span></li>
+        
+        <!--<li><label>Location</label><span data-bind="text: $root.SelectedData().location"></span></li>-->
+    </ul>
+    
+ 
+    <div class="form-toolbar">
+
+        <button data-bind="onclick: function(){$(document).click()}">
+            Edit
+        </button>
+       
+    </div>
+    <div class="form-toolbar">
+
+      
+        <button data-bind="onclick: function(){$(document).click()}">
+            Remove Hold
+        </button>
+        
+    </div>
+    <div class="form-toolbar">
+
+       
+        <button data-bind="onclick: function(){$(document).click()}">
+            Schedule Hold
+        </button>
+    </div>
+
+</div>
