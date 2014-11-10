@@ -1,0 +1,250 @@
+﻿<div class="scheduling-scheduleview">
+    <div class="Scheduling-View-WeeklySchedule" data-bind="visible:WeeklySchedule">
+        <div class="scheduling-view-weeklyschedule-recurring">
+            <div class="table-view">
+                <div class="table-row" style="line-height:30px;">
+                    <div class="col">
+                        <span>Facility:</span>
+                    </div>
+                    <div class="right-col">
+                        <span data-bind="text: FacilityName"></span>
+                    </div>
+                </div>
+                <div class="table-row">
+                    <div class="col" style="width:20%"><span>Work Hours:</span></div>
+                    <div class="right-col"> 
+                        <input type="radio" id="chkWorkHours" name="type" value="1" data-bind="checked: WorkhourType, enable: SED_enable" /> Are the Same Each Day &nbsp;<a href="#" data-bind="event:{click:showSetWorkHour},visible:!VaryByDay(), text: $root.LinkText()"></a>&nbsp;&nbsp;&nbsp;
+                        <input type="radio" id="chkValueByDay" name="type" value="2" data-bind="checked: WorkhourType, enable: VBD_enable" /> Vary by Day
+                       
+                        <span id="spnDataChanged" data-bind="text:IsDataChanged,visible:false"></span>
+                        <span id="spnScheduleType" data-bind="text:WeeklySchedule,visible:false"></span>
+                    </div>
+                </div>
+            </div>
+            <div style="padding-top:5px;">
+                <div class="table-view varybyday" data-bind="visible:VaryByDay">
+                    <!-- ko foreach: DaysCollection -->
+                    <div class="table-row">
+                        <div class="col"><input type="checkbox" value="$data.IsChecked" data-bind="checked: $data.IsChecked" /></div>
+                        <div class="col"><span data-bind="text: $data.WorkDay,style: { color: $data.Color }"></span></div>
+                        <div class="right-col link-width">
+                            <a href="#" data-bind="event:{click:$root.showSetWorkHour.bind($root,$index())}, visible: $data.IsChecked(), text: $data.vbd_LinkText()"></a>
+                            <span data-bind="visible: !$data.IsChecked()">Not Working</span>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="workhour-container" data-bind="visible: SetWorkHour,style:{width: VaryByDay() ? '76%' : '100%' }">
+                    <div id="container">
+                        <div class="tab_container">
+                            <div id="tbWorkHour" class="tab_content">
+                                <div class="workhour-toprow">
+                                    <h3 class="work-hour-title">Enter work hours and breaks</h3>
+                                    <!--<button class="show-capacity">Show Capacity >></button>-->
+                                </div>
+
+                                <div class="scroll-container">
+                                    <div class="table-view">
+                                        <div class="header-row">
+                                            <div class="col">Type</div>
+                                            <div class="col">Start </div>
+                                            <div class="col">End</div>
+                                            <div class="col"> </div>
+                                        </div>
+                                        <!-- ko foreach: ScheduleRows -->
+                                        <div class="table-row" data-bind="style:{'line-height': $root.VaryByDay() ? '25px' : '40px' }">
+                                            <!-- ko if : !($data.IsBreak())  -->
+                                            <span class="col">Work Hours</span>
+                                            <!-- /ko -->
+                                            <!-- ko if : ($data.IsBreak())  -->
+                                            <span class="col">Break</span>
+                                            <!-- /ko -->
+                                            <div class="col">
+                                                <input class="timeControl fixHeight" data-bind="field: $data.WorkStartTime, type: AppUI.FieldType.choice,choices: $root.TimeChoices,event: { change: $root.CalculateObservableChanges.bind($root,'Start',$index())} " />
+                                            </div>
+                                            <div class="col">
+                                                <input class="timeControl fixHeight" data-bind="field: $data.WorkEndTime, type:AppUI.FieldType.choice,choices: $root.TimeChoices,event: { change: $root.CalculateObservableChanges.bind($root,'End',$index())} " />
+                                            </div>
+                                            <!-- ko if : !($data.IsBreak())  -->
+                                            <div class="col">
+                                                <button class="dummyClsAddSchedule" data-bind="event:{click:$root.AddItems.bind($root,$index())},enable: $data.ButtonStatus()"><span>Add Break</span> </button>
+                                            </div>
+                                            <!-- /ko -->
+                                            <!-- ko if : ($data.IsBreak())  -->
+                                            <div class="col">
+                                                <button class="dummyClsAddSchedule" data-bind="event:{click:$root.DeleteItems.bind($root,$index())}"><span>Delete</span></button>
+                                            </div>
+                                            <!-- /ko -->
+                                        </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="strip">Total:<label data-bind="text: Total"></label><label data-bind="text: TimeTypeTotal"></label>,Working: <label data-bind="text: Working"></label> <label data-bind="text: TimeTypeWorking"></label>,Breaks:<label data-bind="text: Breaks"></label> <label data-bind="text: TimeTypeBreaks"></label></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <button title="Commit Day" data-bind="onclick: $root.vbd_Save.bind($root),visible: $root.VaryByDay() && $root.SetWorkHour()"><span>Ok</span></button>
+                    </div>
+                </div>
+               
+                <div id="tableBottom" class="bottom-container">
+                    <div class="table-view">
+                        <div class="table-row" data-bind="visible:!$root.VaryByDay()">
+                            <div class="col">
+                                <span>Work Days:</span>
+                            </div>
+                            <div class="right-col">
+                                <div class="table-view">
+                                    <div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="SU" data-bind="checked: SelectedWorkDays" />
+                                            <span>Sun</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="MO" data-bind="checked: SelectedWorkDays" />
+                                            <span>Mon</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="TU" data-bind="checked: SelectedWorkDays" />
+                                            <span>Tue</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="WE" data-bind="checked: SelectedWorkDays" />
+                                            <span>Wed</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="TH" data-bind="checked: SelectedWorkDays" />
+                                            <span>Thu</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="FR" data-bind="checked: SelectedWorkDays" />
+                                            <span>Fri</span>
+                                        </div>
+                                        <div class="right-col">
+                                            <input type="checkbox" value="SA" data-bind="checked: SelectedWorkDays" />
+                                            <span>Sat</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:5px 0 5px 0" data-bind="visible:IsEditMode && IsDeleteAvailable">
+                            <input type="checkbox" style="width:auto;" data-bind="visible:IsEditMode && IsDeleteAvailable,checked: IsDeleteSchedule" /><span> Delete Schedule</span>
+                        </div>
+                        <div class="table-row" data-bind="visible:false">
+                            <div class="col" ><span>Business Closures:</span></div>
+                            <div class="right-col" style="width:80%" ><input type="radio" name="BusinessColusreOption" value="OBS" data-bind="checked:BusinessClosure" /><span>Observe</span><input type="radio" name="BusinessColusreOption" value="DNO" data-bind="checked:BusinessClosure" /><span>Do not observe</span></div>
+                        </div>
+
+                        <div class="table-row">
+                            <div class="col" style="vertical-align:middle"><span>Date Range:</span></div>
+                            <div class="right-col">
+                                <div class="table-view">
+                                    <div class=" table-row">
+                                        <div class="right-col" style="vertical-align:middle;padding-left:5px;width:90px"><span>Starting On</span></div>
+                                        <div class="col"><input data-bind="field: 'dateRange',value: DateRange, type: AppUI.FieldType.date,required:'Date is required'" /></div>
+                                       
+                                        <div class="right-col" style="width:20px;vertical-align:middle;"><span>Until: </span></div>&nbsp;
+                                        <!--<span data-bind="visible:IsEditMode,text: $root.UntilDateString() == MAXDATE ? NOENDDATE : $root.UntilDateString"></span>-->
+                                        <div class="col"><input data-bind="field: 'untilDateString',value: UntilDateString, type: AppUI.FieldType.date" /></div>&nbsp;&nbsp;&nbsp;
+                                      
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-row" style="display:none">
+                            <div class="col"><span>Time Zone</span></div>
+                            <div class="right-col timezone"><input data-bind="field: $root.TimezoneValue, type: AppUI.FieldType.choice,choices: $root.TimeZone" /></div>
+                        </div>
+                        <div style="clear:both;">&nbsp;</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="schedule-work-hour" data-bind="visible:DailySchedule">
+        <div id="container">
+            <div class="tab_container">
+                <div id="tbWorkHour" class="tab_content">
+                    <div class="table-view">
+                        <div class="table-row">
+                            <div class="col">
+                                <span>Facility:</span>
+                            </div>
+                            <div class="right-col">
+                                <span data-bind="text: FacilityName"></span>
+                            </div>
+                        </div>
+                        <div class="table-row">
+                            <div class="col" style="width:20%"><h3>Select a Date</h3></div>
+                            <div class="right-col" style="vertical-align:middle;"><input data-bind="field:'selecteddate', value: selectedDate,  type: AppUI.FieldType.date,required:'Date is required'" /></div>
+                        </div>
+                    </div>
+                    <div class="workhour-toprow">
+                        <h3 class="work-hour-title">Enter work hours and breaks</h3>
+                        <!--<button class="show-capacity">Show Capacity >></button>-->
+                    </div>
+                    <div class="scroll-container">
+
+                        <div class="table-view">
+                            <div class="header-row">
+                                <div class="col">Type</div>
+                                <div class="col">Start </div>
+                                <div class="col">End</div>
+                                <div class="col"> </div>
+                            </div>
+                            <!-- ko foreach: ScheduleRows -->
+                            <div class="table-row">
+                                <!-- ko if : !($data.IsBreak())  -->
+                                <span class="col" style="width:135px;">Work Hours</span>
+                                <!-- /ko -->
+                                <!-- ko if : ($data.IsBreak())  -->
+                                <span class="col">Break</span>
+                                <!-- /ko -->
+                                <div class="col">
+                                    <input class="timeControl fixHeight" data-bind="field: $data.WorkStartTime, type: AppUI.FieldType.choice,choices: $root.TimeChoices,event: { change: $root.CalculateObservableChanges.bind($root,'Start',$index())} " />
+                                </div>
+                                <div class="col">
+                                    <input class="timeControl fixHeight" data-bind="field: $data.WorkEndTime, type:AppUI.FieldType.choice,choices: $root.TimeChoices,event: { change: $root.CalculateObservableChanges.bind($root,'End',$index())} " />
+                                </div>
+                                <!-- ko if : !($data.IsBreak())  -->
+                                <div class="col" style="width:120px;">
+                                    <button class="dummyClsAddSchedule" data-bind="event:{click:$root.AddItems.bind($root,$index())},enable: $data.ButtonStatus()"><span>Add Break</span> </button>
+                                </div>
+                                <!-- /ko -->
+                                <!-- ko if : ($data.IsBreak())  -->
+                                <div class="col">
+                                    <button class="dummyClsAddSchedule" data-bind="event:{click:$root.DeleteItems.bind($root,$index())}"><span>Delete</span></button>
+                                </div>
+                                <!-- /ko -->
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        
+                    </div>
+                    <div class="strip" style="background-color: lightgray;margin-bottom:40px;">Total:<label data-bind="text: Total"></label><label data-bind="text: TimeTypeTotal"></label>,Working: <label data-bind="text: Working"></label> <label data-bind="text: TimeTypeWorking"></label>,Breaks:<label data-bind="text: Breaks"></label> <label data-bind="text: TimeTypeBreaks"></label></div>
+                    <div data-bind="visible:IsEditMode && IsDeleteAvailable" style="padding-top:5px;margin-bottom:30px;">
+                        <input type="checkbox" style="width:auto;" data-bind="checked: IsDeleteSchedule,visible:IsEditMode && IsDeleteAvailable" /><span> Delete Schedule</span>
+                    </div>
+                    <div class="table-view" style="padding-top:5px;margin-bottom:80px; display:none">
+                        <div class="table-row">
+                            <div class="col" style="width:20%"><span>Time Zone</span></div>
+                            <div class="right-col timezone"><input data-bind="field: $root.TimezoneValue, type: AppUI.FieldType.choice,choices: $root.TimeZone" /></div>
+                        </div>
+                    </div>
+                    <div style="clear:both;">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-toolbar dock-bottom">
+        <button data-bind="onclick: SaveWorkHour.bind($root,0) ,enable: EnableSaveBtn">
+            <span>Save</span>
+        </button>
+        <button data-bind="onclick: SaveWorkHour.bind($root,1) ,enable: EnableSaveBtn">
+            <span>Save &amp; Close</span>
+        </button>
+    </div>
+</div>

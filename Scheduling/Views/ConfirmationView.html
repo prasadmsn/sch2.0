@@ -1,0 +1,20 @@
+﻿
+<div id="ConfirmationMessageView" data-bind="visible: IsConflict">
+    <div>
+        <br />
+        You are attempting to save a new Work Hours that conflict with Existing Work Hours on your calendar <br />
+        <ul>
+            <li>Existing Work Hours Facility : <span class="conflictstyle" data-bind="text: $root.ConflictFacilityName"></span></li>
+            <li>Existing Schedule : <span class="conflictstyle" data-bind="text: $root.ConflictSchedule"></span> </li>
+        </ul>
+    </div>
+    <div class="form-toolbar">
+        <button data-bind="onclick: CancelConflict">
+            Keep Existing Work Hours
+        </button>
+        <button data-bind="onclick: SaveConflict">
+            Save New Work Hours
+        </button>
+    </div>
+</div>
+

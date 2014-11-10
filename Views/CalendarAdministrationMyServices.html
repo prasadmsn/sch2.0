@@ -1,0 +1,60 @@
+﻿<style type="text/css">
+    table.gridtable {
+        font-family: verdana,arial,sans-serif;
+        font-size: 15px;
+        color: rgba(40, 146, 254, 1);
+        border-width: 1px;
+        border-color: rgba(40, 146, 254, 1);
+        border-collapse: collapse;
+        width:100%;
+    }
+
+        table.gridtable th {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: rgba(40, 146, 254, 1);
+            background-color: white;
+        }
+
+        table.gridtable td {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: rgba(40, 146, 254, 1);
+            background-color: #ffffff;
+        }
+</style>
+<div class="medication-sliding-scale" style="margin: 20px;">
+    <div>
+        <table class="gridtable">
+            <thead>
+                <tr data-bind="foreach: ColumnValue">
+                    <th>
+                        <span data-bind="text: Text">
+                        </span>
+                    </th>
+                    
+                </tr>
+
+            </thead>
+            <tbody data-bind="foreach: RowValue">
+                <tr style="height:60px">
+                    <td>
+                        <span data-bind="text: Text">
+                        </span>
+                    </td>
+                    <!-- ko foreach: $root.ColumnValue -->
+                    <!-- ko if: Text != '' -->
+                    <td>
+                        <div>                       
+                        </div>                        
+                    </td>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <input type="button" value="Save My Services" />
+</div>

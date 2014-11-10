@@ -1,0 +1,24 @@
+
+
+<div class="scheduling-provider-workhours-location-sidebar">
+
+    <h2>Filter by location:</h2>
+
+    <div class="ccx-tile-menu">
+
+        <!-- ko foreach: $root.locations -->
+        <a class="tile blue" href="javascript:void(0)" data-bind="click: function(){$root.location($data);}">
+            <img alt="Date/Time" src="images/location.png" />
+            <span data-bind="text: LocationName"></span>
+        </a>
+        <!-- /ko -->
+       
+    </div>
+
+    <div class="form-toolbar">
+        <button data-bind="onclick: function(){$root.location();}">
+            Cancel
+        </button>
+    </div>
+
+</div>

@@ -1,0 +1,125 @@
+
+
+<div class="scheduling-provider-workhours-calendar">
+
+    <div class="calendar-month-header">
+
+        <button title="Previous Month" data-bind="onclick: $root.prevMonth">&lt;</button>
+        <span class="month-header">
+            <span data-bind="text: $root.SelectedMonth()"></span>
+            <span>, </span>
+            <span data-bind="text: $root.SelectedDate().getFullYear()"></span>
+        </span>
+        <button title="Next Month" data-bind="event:{click: $root.nextMonth}">&gt;</button>
+
+        <span class="icon-toolbar">
+            <button title="Reload" data-bind="onclick: $root.reload.bind($root)">
+                <img alt="Reload" src="images/reload.png" />
+            </button>
+            <button title="Filter" id="FilterButton" data-bind="onclick: $root.filter.bind($root)">
+                <img id="FilterButtonImg"alt="Filter" src="images/menu.png" />
+            </button>
+        </span>
+        <div id="ddllocations"  class="Filter"> 
+            <!-- ko if: AppData.where($root.SelectedMonthLocations(), function(h){ return (h.IsActive==true); }).length<=0 -->
+            <span class="msg" data-bind="text: 'There is no facilities found.'"></span>
+            <!-- /ko -->
+            <ul class="ccx-tile-menu">
+                <!-- ko foreach: $root.SelectedMonthLocations -->                
+                <!-- ko if: IsActive -->
+                <li>
+                    <a class="locationTile blue" href="javascript:void(0)" data-bind="attr:{title:$data.LocationName}, onclick: $root.filterLocation.bind($root),style: {  'border-color':($data.BorderColorCode),'background-color':($data.Color)  } ">
+
+                        <span data-bind="text: PartialLocationName"></span>
+                    </a>
+                </li>
+                <!-- /ko -->
+                <!-- /ko -->
+             
+            </ul>
+
+        </div>
+
+    <div class="calendar-table">
+        <div class="calendar-week-header">
+            <div class="calendar-column">
+                <div class="week-header">Sunday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Monday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Tuesday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Wednesday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Thursday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Friday</div>
+            </div>
+            <div class="calendar-column">
+                <div class="week-header">Saturday</div>
+            </div>
+        </div>
+
+        <!-- ko foreach: CalendarRows -->
+
+        <div class="calendar-row">
+            <!-- ko foreach: Days -->
+
+            <div class="calendar-day" data-bind="'event':{click: function () {$root.HighLightSelection($root, event,$data,$index())}}">
+                <div class="calendar-cell" data-bind=" css:{'selected-month':IsCurrentMonth}">
+                    <!-- ko if: Day == 1 -->
+                    <div class="day-header" data-bind="text: $root.getMonthName(Date) + ' 1st'"></div>
+                    <!-- /ko -->
+                    <!-- ko if: Day > 1 -->
+                    <div class="day-header" data-bind="text: Day"></div>
+                    <!-- /ko -->
+                    <button class="add-button" title="Add" data-bind="onclick: $root.addItem.bind($root,Date)">
+                        <img alt="Add" src="images/add.png" />
+                    </button>
+
+                    <div class="day-schedule">
+                        <!-- ko foreach: AppData.where($root.WorkHours(), function(h){ return $root.daysAreEqual(h.Date,$data.Date); }) -->
+                        
+                        <div class="schedule-item" data-bind="
+                                                              'event': {
+                                                                  click:  $root.showRelated,
+                                                                  dblclick:$root.EditWorkHours.bind($root,$data, event, $index()),
+                                                                  contextmenu: function () {$root.EditWorkHours($data, event,$index)}
+                                                              },
+                                                              attr: {
+                                                                  'class': 'schedule-item link-' + ($data.LinkId || 'none'),
+                                                                  title: $root.formatTime(StartTime,true) +'-'+ $root.formatTime(EndTime,true) +' ' 
+                                                                  +$data.Location || $data.Reason || ''
+                                                              },
+                                                              css:{
+                                                                  'weekly':Type==Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Weekly,
+                                                                  'daily':Type==Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Daily,
+                                                                  'timeoff':Type==Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.TimeOff,
+                                                                  'break':Type==Ccx.Scheduling.ViewModels.Provider.WorkHours.CalendarScheduleType.Break
+                                                              },style: {  'border-color':($data.BorderColor),'background-color':($data.Color)  }">
+
+                            <!-- ko if: !$data.IsAllDay -->
+                            <span data-bind="text:  $root.formatTime(StartTime,true) +'-'+ $root.formatTime(EndTime,true)+  '|' + PartialLocation"></span>
+                            <!-- /ko -->
+                            <!-- ko if: $data.IsAllDay -->
+                            <span>All Day</span>
+                            <!-- /ko -->
+                        </div>
+
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- /ko -->
+        </div>
+
+        <!-- /ko -->
+    </div>
+</div>
+</div>

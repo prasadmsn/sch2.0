@@ -1,0 +1,59 @@
+﻿<div id="container" class="scheduling-EditSchedulePopup">
+ 
+    <p class="global-text">The work hours you selected are part of a recurring weekly schedule.</p>
+    <p class="global-text"><strong>Select how much of the schedule you want to edit</strong></p>
+    <div class="date-strip-container">
+        <span class="pull-left">
+            <input type="radio" name="radiobutton" value="0" data-bind="checked: ScheduleType" />
+        </span> <span class="date-title" data-bind="text:'This date only: '+SelectedDate()"> </span>
+        <div style="clear:both;"></div>
+        <div class="date-strip">
+            <div class="blue blue-none blue-half-width">
+                <ul>
+                    <li class="blue-bg"><span class="date-control"><span class="date" data-bind="text:SelectedDate"></span></span></li>  
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="date-strip-container">
+        <span class="pull-left">
+            <input type="radio" name="radiobutton" value="1" data-bind="checked: ScheduleType, enable: IsNotStartDateofRecurrence" />
+        </span> <span class="date-title" data-bind="text:'From: '+SelectedDate()"></span>
+        <div style="clear:both;"></div>
+        <div class="date-strip">
+            <div class="blue blue-half-width">
+                <ul>
+                    <li class="blue-bg"><span class="date-control"><span class="date" data-bind="text:SelectedDate"></span></span></li> 
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="date-strip-container">
+        <span class="pull-left">
+            <input type="radio" name="radiobutton" value="2" data-bind="checked: ScheduleType" />
+        </span> <span class="date-title">Entire recurring weekly schedule from start to end</span>
+        <div style="clear:both;"></div>
+        <div class="date-strip">
+            <div class="blue blue-full-width">
+                <ul>
+                    <li class="blue-bg"><span class="date-control"><span class="date" data-bind="text:ScheduleStartedDate"></span></span></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+        <div class="footer-buttons">
+            <button data-bind="onclick:Close" >Cancel</button>
+            <button data-bind="onclick:ShowSchedule">Ok</button>
+        </div>
+
+    </div>
+</div>
+
+
+
